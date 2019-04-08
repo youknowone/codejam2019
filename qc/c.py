@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# working for sample but not working for attempts
+# Fixed in practice mode
 
 def int_input():
     text = input()
@@ -26,21 +26,35 @@ def print_case(count, fmt, *args, **kw):
     else:
         print(prefix, fmt)
 
+import random
 from math import gcd
 
 alphalits = [chr(ord('A') + n) for n in range(26)]
+
+
+def pick(enc):
+    i = random.randint(0, len(enc)-2)
+    if enc[i] != enc[i+1]:
+        return i
+    return pick(enc)
 
 def solution(count):
     n, l = intlist_input()
     enc = intlist_input()
     assert len(enc) == l
 
-    dec = [gcd(enc[i], enc[i+1]) for i in range(l-1)]
-    dec.insert(0, enc[0] // dec[0])
-    dec.append(enc[-1] // dec[-1])
+    i = pick(enc)
+    dec = [None] * (l+1)
+
+    dec[i+1] = gcd(enc[i], enc[i+1])
+    for j in range(i, -1, -1):
+        dec[j] = enc[j] // dec[j+1]
+
+    for j in range(i+2, l+1):
+        dec[j] = enc[j-1] // dec[j-1]
 
     alphabets = sorted(frozenset(dec))
-    # assert len(alphabets) == 26
+    assert len(alphabets) == 26
     # print(dec, alphabets)
     alphamap = dict(zip(alphabets, alphalits))
 
